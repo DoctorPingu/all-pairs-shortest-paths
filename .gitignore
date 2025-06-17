@@ -1,0 +1,17 @@
+# Compiled files
+*.o
+*.out
+*.exe
+*.dll
+
+# Build directories
+build/
+bin/
+
+# IDE/Editor specific files
+.vscode/
+*.swp
+*.swo
+
+# Mac specific
+.DS_Store
