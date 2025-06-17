@@ -1,27 +1,3 @@
-/****************************************************************************************************
-* README
-* ---------
-* This task was completed independently.
-* As part of the assignment requirements, no GenAI were used to directly solve the assignment, write logic or produce code output.
-*
-* Any usage of copying and pasting was purely for:
-* - Rearranging sections of existing code.
-* - Reverting back to earlier versions of my own work through the submissions tab.
-* - Improving clarity, formatting or correcting previous logic.
-*
-* All debugging and problem solving followed academic integrity principles outlined by UTS.
-*
-* References:
-* - Bellman Ford Algorithm:
-*   https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm
-*
-* - Floyd Warshall Algorithm:
-*   https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm
-*
-* - Johnson Algorithm:
-*   https://en.wikipedia.org/wiki/Johnson%27s_algorithm
-****************************************************************************************************/
-
 #ifndef GRAPH_HPP_
 #define GRAPH_HPP_
 
@@ -137,23 +113,18 @@ T infinity() {
   }
 }
 
-// This function, existsNegativeCycle, uses the Bellman Ford relaxation method to detect if any negative weight cycle exists within the graph.
 template <typename T>
 bool existsNegativeCycle(const Graph<T>& G) {              
 
-  // We initialise all vertec distances to 0.
-  // This is so that every vertex is considered a starting point.
   int nVertices = G.size();                                
   std::vector<T> dist(nVertices);
 
-  // Relax all edges (nVertices - 1) times.
   bool updated;
   for (int iter = 0; iter < nVertices - 1; ++iter) {
     updated = false;
     for (int u = 0; u < nVertices; ++u) {
       for (const auto& [v, weight] : G.neighbours(u)) {
 
-        // Relaxation - Update dist[v] if a shorter path from u is found.
         if (dist[u] + weight < dist[v]) {
           dist[v] = dist[u] + weight;
           updated = true;
@@ -161,12 +132,9 @@ bool existsNegativeCycle(const Graph<T>& G) {
       }
     }
 
-    // If no distance was updated in this iteration, we can stop early.
     if (!updated) break;
   }
 
-  // Perform one more pass to check for further improvements.
-  // If any distance can be updated now, there is a negative cycle.
   for (int u = 0; u < nVertices; ++u) {
     for (const auto& [v, weight] : G.neighbours(u)) {
       if (dist[u] + weight < dist[v]) {
@@ -175,26 +143,19 @@ bool existsNegativeCycle(const Graph<T>& G) {
     }
   }
 
-  // No further improvement means no negative weight cycle exists.
   return false;
 }
 
-
-// Handles all pairs paths even with negative edge weights. Has two phases:
-// 1.) Reweighting phase
-// 2.) Dijstra phase 
 template <typename T>
 std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
   int nVertices = G.size();
   T INF = infinity<T>();
 
-  // Preparee result matrix and initialise with infinity for no path, 0 on diagonals.
   std::vector<std::vector<T>> distanceMatrix(nVertices, std::vector<T>(nVertices, INF));
   for (int i = 0; i < nVertices; ++i) {
     distanceMatrix[i][i] = 0;
   }
 
-  // 1.) Compute vertex potentials using Bellman Ford from a virtual source.
   std::vector<T> potential(nVertices, 0);
   for (int iter = 0; iter < nVertices - 1; ++iter) {
     bool changed = false;
@@ -209,7 +170,6 @@ std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
     if (!changed) break;
   }
 
-  // Check for negative weight cycle in one more iteration.
   for (int u = 0; u < nVertices; ++u) {
     for (const auto& [v, weight] : G.neighbours(u)) {
       if (potential[u] + weight < potential[v]) {
@@ -218,10 +178,8 @@ std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
     }
   }
 
-  // 2.) Perform Dijkstra from each vertex on the re-weighted graph.
   for (int source = 0; source < nVertices; ++source) {
 
-    // Min heap priority queue for (distance, vertex)
     using NodeDist = std::pair<T, int>;
     std::priority_queue<NodeDist, std::vector<NodeDist>, std::greater<NodeDist>> pq;
     std::vector<T> dist(nVertices, INF);
@@ -234,7 +192,6 @@ std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
       pq.pop();
       if (d != dist[u]) continue;
 
-      // Relaxation: check all neighbours of u
       for (const auto& [v, weight] : G.neighbours(u)) {
         T adjustedWeight = weight + potential[u] - potential[v];
         if (d + adjustedWeight < dist[v]) {
@@ -244,7 +201,6 @@ std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
       }
     }
 
-    // Convert distances back to original weights for the source.
     for (int v = 0; v < nVertices; ++v) {
       if (dist[v] == INF) {
         distanceMatrix[source][v] = INF;
@@ -257,20 +213,16 @@ std::vector<std::vector<T>> johnsonAPSP(const Graph<T>& G) {
   return distanceMatrix;
 }
 
-
-// Implementation of Floyd Warshall uses classic dynamic programmiing approach.
 template <typename T>
 std::vector<std::vector<T>> floydWarshallAPSP(const Graph<T>& G) {
   int nVertices = G.size();
   T INF = infinity<T>();
 
-  // Initialise distance matrix with infinity.
   std::vector<std::vector<T>> dist(nVertices, std::vector<T>(nVertices, INF));
   for (int i = 0; i < nVertices; ++i) {
     dist[i][i] = 0;
   }
 
-  // Set initial distances based on direct edges in the graph.
   for (int u = 0; u < nVertices; ++u) {
     for (const auto& [v, weight] : G.neighbours(u)) {
       if (weight < dist[u][v]) {
@@ -279,16 +231,11 @@ std::vector<std::vector<T>> floydWarshallAPSP(const Graph<T>& G) {
     }
   }
 
-  // Floyd Warshall main loop - Try each vertex k as an intermediate
   for (int k = 0; k < nVertices; ++k) {
     for (int i = 0; i <nVertices; ++i) {
-      // Skip if i -> k is unreachable.
       if (dist[i][k] == INF) continue;
       for (int j = 0; j < nVertices; ++j) {
-        // Skip if k -> j is unreachable.
         if (dist[k][j] == INF) continue;
-        
-        // If a shorter path exists via k, update the distance.
         T newDistance = dist[i][k] + dist[k][j];
         if (newDistance < dist[i][j]) {
           dist[i][j] = newDistance;

@@ -5,9 +5,6 @@
 #include <random>
 #include "graph.hpp"
 
-// *** Negative Cycle Test Cases
-
-// negative cycle 0, 1, 0
 TEST(negativeCycleTest, twoVerticesNegativeLoop) {
   Graph<int> G {2};
   G.addEdge(0, 1, 1);
@@ -15,7 +12,6 @@ TEST(negativeCycleTest, twoVerticesNegativeLoop) {
   ASSERT_TRUE(existsNegativeCycle(G));
 }
 
-// no negative cycle
 TEST(negativeCycleTest, twoVerticesNoNegativeLoop) {
   Graph<int> G {2};
   G.addEdge(0, 1, 5);
@@ -23,7 +19,6 @@ TEST(negativeCycleTest, twoVerticesNoNegativeLoop) {
   EXPECT_FALSE(existsNegativeCycle(G));
 }
 
-// negative cycle 0, 1, 2, 0
 TEST(negativeCycleTest, negativeTriangle) {
   Graph<int> G {3};
   G.addEdge(0, 1, 1);
@@ -32,7 +27,6 @@ TEST(negativeCycleTest, negativeTriangle) {
   ASSERT_TRUE(existsNegativeCycle(G));
 }
 
-// no negative cycle
 TEST(negativeCycleTest, zeroWeightTriangle) {
   Graph<int> G {3};
   G.addEdge(0, 1, 1);
@@ -41,7 +35,6 @@ TEST(negativeCycleTest, zeroWeightTriangle) {
   EXPECT_FALSE(existsNegativeCycle(G));
 }
 
-// no negative cycle
 TEST(negativeCycleTest, fourVerticesPositiveCycle) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -51,7 +44,6 @@ TEST(negativeCycleTest, fourVerticesPositiveCycle) {
   EXPECT_FALSE(existsNegativeCycle(G));
 }
 
-// no negative cycle
 TEST(negativeCycleTest, fourVerticesZeroCycle) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -61,7 +53,6 @@ TEST(negativeCycleTest, fourVerticesZeroCycle) {
   EXPECT_FALSE(existsNegativeCycle(G));
 }
 
-// negative cycle 0, 1, 2, 3, 0
 TEST(negativeCycleTest, fourVerticesNegativeCycle) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -71,7 +62,6 @@ TEST(negativeCycleTest, fourVerticesNegativeCycle) {
   ASSERT_TRUE(existsNegativeCycle(G));
 }
 
-// no negative cycle
 TEST(negativeCycleTest, fourVerticesMoreEdges) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -85,7 +75,6 @@ TEST(negativeCycleTest, fourVerticesMoreEdges) {
   EXPECT_FALSE(existsNegativeCycle(G));
 }
 
-// negative cycle 1, 2, 3, 1
 TEST(negativeCycleTest, fourVerticesNegativeCycleAgain) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -100,7 +89,6 @@ TEST(negativeCycleTest, fourVerticesNegativeCycleAgain) {
   ASSERT_TRUE(existsNegativeCycle(G));
 }
 
-// negative cycle 1, 2, 4, 3, 1
 TEST(negativeCycleTest, fiveVerticesNegativeCycle) {
   Graph<int> G {5};
   G.addEdge(0, 1, 2);
@@ -113,13 +101,10 @@ TEST(negativeCycleTest, fiveVerticesNegativeCycle) {
   ASSERT_TRUE(existsNegativeCycle(G));
 }
 
-// function to create a random directed and weighted graph with N vertices
-// p is the probability of an edge between any two vertices
 Graph<int> createRandomGraph(int N, unsigned seed, double p = 0.5) {
   std::mt19937 mt {seed};
   std::uniform_int_distribution<int> vertexDist {0, N - 1};
   std::binomial_distribution<int> heads {1, p};
-  // edge weights are randomly chosen from -1 to 100
   std::uniform_int_distribution<int> weight {-1, 100};
   Graph<int> G {N};
   for (int i = 0; i < N; ++i) {
@@ -133,7 +118,6 @@ Graph<int> createRandomGraph(int N, unsigned seed, double p = 0.5) {
   return G;
 }
 
-// Random test cases on size 100 graphs
 TEST(negativeCycleTest, random100_0) {
   Graph<int> G = createRandomGraph(100, 1198988931, 0.15);
   EXPECT_TRUE(existsNegativeCycle(G));
@@ -233,8 +217,6 @@ TEST(negativeCycleTest, random100_19) {
   Graph<int> G = createRandomGraph(100, 931073880, 0.15);
   EXPECT_FALSE(existsNegativeCycle(G));
 }
-
-// random test cases on size 200 graphs
 
 TEST(negativeCycleTest, random200_0) {
   Graph<int> G = createRandomGraph(200, 850177966, 0.1);
@@ -336,12 +318,6 @@ TEST(negativeCycleTest, random200_19) {
   EXPECT_TRUE(existsNegativeCycle(G));
 }
 
-// *** End of negative cycle tests
-
-// some machinery for testing the APSP functions
-
-// check that a given vector of distances is optimal
-// checks that no distance can be improved via relaxation
 template <typename T>
 bool allEdgesRelaxed(const std::vector<T>& bestDistanceTo, const Graph<T>& G,
                       int source) {
@@ -363,11 +339,9 @@ bool allEdgesRelaxed(const std::vector<T>& bestDistanceTo, const Graph<T>& G,
   return true;
 }
 
-// type to represent johnsonAPSP or floydWarshallAPSP
 using apspFunction =
   std::function<std::vector<std::vector<int> >(const Graph<int>&)>;
 
-// function to create a random graph and test the output of f on it
 void randomTest(apspFunction f, int N, unsigned seed, double p = 0.5) {
   std::mt19937 mt {seed};
   std::uniform_int_distribution<int> vertexDist {0, N - 1};
@@ -388,8 +362,6 @@ void randomTest(apspFunction f, int N, unsigned seed, double p = 0.5) {
     ASSERT_TRUE(allEdgesRelaxed(distanceMatrix.at(v), G, v));
   }
 }
-
-// ***Tests of johnsonAPSP
 
 TEST(johnsonTest, dijkstraFailure) {
   Graph<int> G {4};
@@ -418,7 +390,6 @@ TEST(johnsonTest, dijkstraFailure2) {
   }
 }
 
-// Test on graph in the file tinyEWD.txt
 TEST(johnsonTest, tinyJohnson) {
   Graph<int> G {"tinyEWD.txt"};
   std::vector<std::vector<int> > result = johnsonAPSP(G);
@@ -488,8 +459,6 @@ TEST(johnsonTest, tinyJohnson) {
   ASSERT_EQ(result.at(7).at(7), 0);
 }
 
-
-// Test on graph in the file mediumEWD.txt
 TEST(johnsonTest, mediumJohnson) {
   Graph<double> G {"mediumEWD.txt"};
   std::vector<std::vector<double> > result = johnsonAPSP(G);
@@ -980,9 +949,6 @@ TEST(johnsonTest, random1000c) {
   randomTest(johnsonAPSP<int>, 1'000, 2'389'239, 0.005);
 }
 
-// *** End of tests of johnsonAPSP
-
-// *** Tests of floydWarshallAPSP
 TEST(FWTest, dijkstraFailure) {
   Graph<int> G {4};
   G.addEdge(0, 1, 1);
@@ -1010,7 +976,6 @@ TEST(FWTest, dijkstraFailure2) {
   }
 }
 
-// Test of FloydWarshall on graph in the file tinyEWD.txt
 TEST(FWTest, tinyFloydWarshall) {
   Graph<double> G {"tinyEWD.txt"};
   std::vector<std::vector<double> > result = floydWarshallAPSP(G);
@@ -1080,7 +1045,6 @@ TEST(FWTest, tinyFloydWarshall) {
   ASSERT_EQ(result.at(7).at(7), 0);
 }
 
-// Test of FloydWarshall on graph in the file mediumEWD.txt
 TEST(FWTest, mediumFloydWarshall) {
   Graph<double> G {"mediumEWD.txt"};
   std::vector<std::vector<double> > result = floydWarshallAPSP(G);
@@ -1570,18 +1534,6 @@ TEST(FWTest, random400) {
 TEST(FWTest, random500) {
   randomTest(floydWarshallAPSP<int>, 500, 2'829'211, 0.01);
 }
-
-// TEST(FWTest, random1000a) {
-//   randomTest(floydWarshallAPSP<int>, 1000, 32'218'119, 0.005);
-// }
-//
-// TEST(FWTest, random1000b) {
-//   randomTest(floydWarshallAPSP<int>, 1000, 98'239'283, 0.005);
-// }
-//
-// TEST(FWTest, random1000c) {
-//   randomTest(floydWarshallAPSP<int>, 1'000, 2'389'239, 0.005);
-// }
 
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
