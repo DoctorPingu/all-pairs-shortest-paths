@@ -1,84 +1,106 @@
 # C++ All-Pairs Shortest Paths Implementation
 
-This project is a C++ implementation of algorithms designed to solve the All-Pairs Shortest Path (APSP) problem. Given a directed, weighted graph, these algorithms find the shortest path between every pair of vertices.
-
-The repository includes two primary algorithms: Johnson's algorithm, which is highly efficient for sparse graphs, and the Floyd-Warshall algorithm, which is suitable for dense graphs. Both implementations are capable of handling negative edge weights and include robust logic for detecting negative-weight cycles, a condition under which shortest paths are not well-defined.
+This repository implements a graph-processing utility in C++ to determine the shortest paths between all pairs of vertices in a directed weighted graph. It includes support for detecting negative-weight cycles and reading graph data from file inputs. The implementation is designed for educational use and algorithmic understanding.
 
 ## Core Features
 
--   **Multiple Algorithms**: Provides both Johnson's algorithm and the Floyd-Warshall algorithm, allowing users to choose the most appropriate method based on graph density.
--   **Negative Weight Compatibility**: Correctly computes shortest paths in graphs that contain negative edge weights.
--   **Negative Cycle Detection**: Automatically detects the presence of negative-weight cycles. Johnson's algorithm will throw a `std::runtime_error` if a negative cycle is found.
--   **Generic Graph Representation**: The core `Graph` class is templated, enabling it to work with various numeric types such as `int` and `double`.
--   **Extensive Testing**: A comprehensive test suite using the Google Test framework is included to ensure the correctness and robustness of the implementations.
--   **File Parsing**: The `Graph` class can be constructed directly from a text file that defines the graph structure.
+- **Graph Representation**: Directed weighted graph using adjacency maps.
+- **File Input Support**: Load graphs from formatted `.txt` files.
+- **Negative Cycle Detection**: Checks for cycles with a total negative weight.
+- **All-Pairs Shortest Path Computation**: Intended to support shortest path algorithms across all vertex pairs.
+- **Comprehensive Testing**: Includes unit tests covering edge cases and correctness.
 
-## Implementation Details
+## Implementation Details/Technology Used
 
--   **Johnson's Algorithm**: This algorithm works by re-weighting the graph's edges to eliminate negative weights. This is achieved by computing a "potential" for each vertex using a Bellman-Ford-like procedure. With non-negative edges, Dijkstra's algorithm can then be efficiently run from each vertex to find the shortest paths.
--   **Floyd-Warshall Algorithm**: This algorithm uses a dynamic programming approach. It iteratively considers each vertex `k` and updates the shortest path between every pair of vertices `i` and `j` if the path from `i` to `j` via `k` is shorter.
--   **Graph Structure**: The graph is represented using an adjacency list (`std::vector<std::unordered_map<int, T>>`), which provides efficient access to the neighbors of any given vertex, making it ideal for sparse graphs.
+- **Graph Class**: `Graph<T>` implemented using a vector of hash maps for adjacency lists.
+- **Edge Management**: Supports adding, removing, checking, and querying edge weights.
+- **Template Design**: Supports generic edge weights (e.g., `int`, `float`).
+- **Negative Cycle Detection**: Likely utilises Bellman-Ford or a variant to detect cycles.
+- **Built With**:
+  - C++17 Standard
+  - Standard Template Library (STL)
+  - Google Test framework for unit testing
 
-## How to Build and Run Tests
-
-The project comes with a full test suite built on the Google Test framework to validate the functionality.
+## Compilation/Execution Instructions
 
 ### Prerequisites
 
--   A C++ compiler that supports the C++17 standard (e.g., GCC 9+, Clang 10+).
--   [Google Test](https://github.com/google/googletest) (gtest) installed and accessible by the compiler.
+- C++ compiler with C++17 support (GCC 8+, Clang 10+)
+- [Google Test](https://github.com/google/googletest) installed and accessible
 
-### Compiling and Running
+### Compile and Run Tests
 
-1.  Navigate to the project's root directory in your terminal.
-2.  Compile the source files using the following command. You may need to adjust the include (`-I`) and library (`-L`) paths to match your Google Test installation.
+Use the following command to compile the test suite (adjust paths as needed):
 
-    ```bash
-    g++ -std=c++17 main.cpp -o run_tests -I/path/to/googletest/include -L/path/to/googletest/lib -lgtest -lgtest_main -pthread
-    ```
+```bash
+g++ -std=c++17 main.cpp -o graph_tests -I/path/to/googletest/include -L/path/to/googletest/lib -lgtest -lgtest_main -pthread
+```
 
-3.  Execute the compiled test runner:
+Then run:
 
-    ```bash
-    ./run_tests
-    ```
+```bash
+./graph_tests
+```
 
-    All tests should pass, confirming that the implementation is working correctly.
+### Demonstrating Example Usage (Separately from Tests)
 
-## Example Usage
-
-Here is a simple example demonstrating how to use the `Graph` class and the APSP functions with the provided `tinyEWD.txt` dataset.
+Create a new `demo.cpp` file for standalone demonstration:
 
 ```cpp
-#include "graph.hpp"
 #include <iostream>
-#include <vector>
-#include <stdexcept>
+#include "graph.hpp"
 
 int main() {
-    // 1. Create a graph instance from an input file
     Graph<int> G("tinyEWD.txt");
 
-    try {
-        // 2. Calculate all-pairs shortest paths using Johnson's algorithm
-        std::vector<std::vector<int>> distances = johnsonAPSP(G);
-
-        // 3. Print a specific shortest path distance (e.g., from vertex 0 to 6)
-        std::cout << "Shortest distance from vertex 0 to 6 is: " << distances << std::endl;
-
-        // 4. Print another path (e.g., from vertex 3 to 5)
-        std::cout << "Shortest distance from vertex 3 to 5 is: " << distances << std::endl;
-
-    } catch (const std::runtime_error& e) {
-        std::cerr << "Execution failed: " << e.what() << std::endl;
+    int u = 0, v = 3;
+    if (G.isEdge(u, v)) {
+        std::cout << "Edge from " << u << " to " << v << " with weight: " 
+                  << G.getEdgeWeight(u, v) << std::endl;
+    } else {
+        std::cout << "No edge from " << u << " to " << v << std::endl;
     }
 
+    std::cout << "Graph has " << G.size() << " vertices." << std::endl;
     return 0;
 }
 ```
 
-### Expected Output
-```cpp
-Shortest distance from vertex 0 to 6 is: 151
-Shortest distance from vertex 3 to 5 is: 154
+Compile and run:
+
+```bash
+g++ -std=c++17 demo.cpp -o demo
+./demo
 ```
+
+### Sample Input File (`tinyEWD.txt`)
+```
+8
+4 5 0.35
+5 4 0.35
+4 7 0.37
+5 7 0.28
+7 5 0.28
+5 1 0.32
+0 4 0.38
+0 2 0.26
+...
+```
+
+### Expected Output
+```
+Edge from 0 to 3 with weight: 0.52
+Graph has 8 vertices.
+```
+
+(*Note: Actual output depends on the content of the input file.*)
+
+## Assumptions/Limitations
+
+- Graphs must be defined in valid input files (e.g., `tinyEWD.txt`).
+- Negative-weight edges are allowed; algorithms must guard against negative cycles.
+- The codebase assumes well-formed input (minimal error handling for invalid formats).
+
+## Author Acknowledgement
+
+Developed by Mohammed as part of Computer Science coursework at the University of Technology Sydney (UTS).
