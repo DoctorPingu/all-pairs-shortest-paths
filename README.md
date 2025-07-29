@@ -100,7 +100,3 @@ Graph has 8 vertices.
 - Graphs must be defined in valid input files (e.g., `tinyEWD.txt`).
 - Negative-weight edges are allowed; algorithms must guard against negative cycles.
 - The codebase assumes well-formed input (minimal error handling for invalid formats).
-
-## Author Acknowledgement
-
-Developed by Mohammed as part of Computer Science coursework at the University of Technology Sydney (UTS).
