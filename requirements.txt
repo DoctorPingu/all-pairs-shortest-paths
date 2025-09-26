@@ -1,0 +1,6 @@
+# Auto-generated requirements for all-pairs-shortest-paths project.
+# This is a C++ project and does not require pip dependencies.
+
+# Build requirements (install via your system package manager, not pip):
+# - g++ (GNU C++ compiler) or clang++
+# - make or cmake (for building the project)
